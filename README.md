@@ -27,12 +27,16 @@ These commands demonstrate best practices for creating intuitive, consistent dev
 ./dx/build
 ./dx/start
 
+# Setup databases (PostgreSQL)
+./dx/setup
+
 # Start Rails server (in a new terminal)
 ./dx/dev
 # Visit http://localhost:3000
 
 # Or use the rebuild command for a fresh start
 ./dx/rebuild
+./dx/setup  # Run setup after rebuild
 ```
 
 ## 📋 Available Commands
@@ -119,7 +123,7 @@ All development commands are located in the `dx/` directory for easy access. Run
 
 * **Ruby Version**: 3.2.9 (managed via [mise](https://mise.jdx.dev/))
 * **Rails Version**: 8.0.2.1
-* **Database**: SQLite (development & test)
+* **Database**: PostgreSQL 16 (development & test)
 * **Node.js**: 22.x (for asset pipeline)
 * **Package Manager**: Yarn
 * **Container OS**: Debian 12 (Bookworm)
@@ -155,7 +159,7 @@ All development commands are located in the `dx/` directory for easy access. Run
 The development environment uses:
 - **Volume mounting** for live code editing
 - **Port 3000** mapped to localhost:3000  
-- **SQLite database** persisted in `storage/` directory
+- **PostgreSQL database** with persistent volume storage
 - **mise** for Ruby version management
 - **Sleep infinity** container for flexibility
 
@@ -198,6 +202,116 @@ After running `./dx/seed`, you can test these URLs to see the sample data in act
 ./dx/seed          # Populate with sample data
 ./dx/dev           # Start Rails server
 # Visit http://localhost:3000 to explore!
+```
+
+## 🗄️ Database Access
+
+### Connecting to PostgreSQL with Database Clients
+
+You can connect to the PostgreSQL database using any PostgreSQL client for debugging and data inspection:
+
+#### **Connection Settings**
+- **Host**: `localhost`
+- **Port**: `5432`
+- **Database**: `yoo_development` (or `yoo_test` for test database)
+- **Username**: `yoo`
+- **Password**: `password`
+
+#### **Popular Database Clients**
+
+**TablePlus** (macOS/Windows)
+1. Create new connection → PostgreSQL
+2. Enter connection settings above
+3. Test connection and save
+
+**pgAdmin** (Cross-platform)
+1. Add New Server
+2. Connection tab: Enter host, port, database, username, password
+3. Save and connect
+
+**DBeaver** (Free, Cross-platform)
+1. New Database Connection → PostgreSQL
+2. Enter connection details
+3. Test Connection → Finish
+
+**psql** (Command line - requires local PostgreSQL client)
+```bash
+# Only works if you have PostgreSQL client installed locally:
+psql -h localhost -p 5432 -U yoo -d yoo_development
+
+# Or using connection URL
+psql postgresql://yoo:password@localhost:5432/yoo_development
+
+# If you don't have psql installed locally, use this instead:
+./dx/exec psql -h db -U yoo -d yoo_development
+```
+
+#### **VS Code Extensions**
+- **PostgreSQL** by Chris Kolkman
+- **Database Client** by Weijan Chen
+
+Connection URL format:
+```
+postgresql://yoo:password@localhost:5432/yoo_development
+```
+
+#### **Quick Database Commands**
+
+**Using dx commands (recommended - always works):**
+```bash
+# Connect to interactive psql session
+./dx/exec psql -h db -U yoo -d yoo_development
+
+# Quick queries via dx commands
+./dx/exec psql -h db -U yoo -d yoo_development -c "\l"                    # List databases
+./dx/exec psql -h db -U yoo -d yoo_development -c "\dt"                   # List tables
+./dx/exec psql -h db -U yoo -d yoo_development -c "SELECT * FROM users LIMIT 5;"  # Sample data
+```
+
+**Using local psql (only if PostgreSQL client is installed locally):**
+```bash
+# Install PostgreSQL client first (macOS example):
+brew install postgresql
+
+# Then connect directly
+psql -h localhost -p 5432 -U yoo -d yoo_development
+```
+
+**Note**: The database is only accessible when containers are running (`./dx/start`).
+
+#### **Troubleshooting Database Connections**
+
+**Connection Refused Error**
+```bash
+# Check if containers are running
+./dx/status
+
+# Start containers if needed
+./dx/start
+
+# Check database health
+./dx/logs db
+```
+
+**Authentication Failed**
+- Verify username: `yoo`
+- Verify password: `password`
+- Verify database name: `yoo_development`
+
+**Port Already in Use**
+If port 5432 is already in use by a local PostgreSQL instance:
+```bash
+# Check what's using port 5432
+lsof -i :5432
+
+# Stop local PostgreSQL if needed (macOS with Homebrew)
+brew services stop postgresql
+```
+
+**Database Not Found**
+```bash
+# Create databases if they don't exist
+./dx/setup
 ```
 
 ## 🤝 Contributing
@@ -273,7 +387,7 @@ echo "✅ [Operation] complete!"
 - **Fresh start**: Run `./dx/rebuild` for a complete environment rebuild
 - **Database reset**: Use `./dx/reset-db` to completely reset your database with fresh sample data
 - **Error handling**: All commands check for Docker availability automatically
-- **Database persistence**: Database files are automatically persisted between restarts
+- **Database persistence**: PostgreSQL data is persisted via Docker volumes between restarts
 - **Flexibility**: Use `./dx/exec` for any Rails commands not covered by specific scripts
 
 ## 🏗️ How DX Commands Work
@@ -329,7 +443,8 @@ CMD ["sleep", "infinity"]         # Keep container alive for development
 - Container runs continuously with `sleep infinity`
 - Commands execute via `docker-compose exec app <command>`
 - Volume mounts sync local code changes instantly
-- SQLite database persists in `storage/` directory
+- PostgreSQL database persists via Docker volumes
+- Database health checks ensure proper startup ordering
 
 #### 🎯 **Design Principles**
 
@@ -367,8 +482,10 @@ echo "✅ Operation complete!"     # Success confirmation
 
 #### **Docker Integration**
 - **Compose File**: `docker-compose.dev.yml` defines the development environment
+- **Multi-Service**: Separate containers for Rails app and PostgreSQL database
 - **Volume Mounting**: Live code editing without rebuilds
-- **Port Mapping**: Rails server accessible at `localhost:3000`
+- **Port Mapping**: Rails server at `localhost:3000`, PostgreSQL at `localhost:5432`
+- **Health Checks**: Database readiness validation before app startup
 - **Environment Variables**: Consistent Rails and database configuration
 
 #### **Rails Integration**

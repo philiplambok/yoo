@@ -1,9 +1,28 @@
 services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: yoo_development
+      POSTGRES_USER: yoo
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yoo -d yoo_development"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   app:
     build:
       context: .
       dockerfile: Dockerfile.dev
     init: true
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       - type: bind
         source: .
@@ -12,5 +31,10 @@ services:
       - "3000:3000"
     environment:
       - RAILS_ENV=development
+      - DATABASE_URL=postgresql://yoo:password@db:5432/yoo_development
+      - DATABASE_TEST_URL=postgresql://yoo:password@db:5432/yoo_test
     stdin_open: true
     tty: true
+
+volumes:
+  postgres_data:

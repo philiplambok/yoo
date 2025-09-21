@@ -13,8 +13,8 @@ RUN apt-get update --quiet --yes && \
     curl \
     build-essential \
     git \
-    sqlite3 \
-    libsqlite3-dev \
+    postgresql-client \
+    libpq-dev \
     libyaml-dev \
     libreadline-dev \
     libssl-dev \
