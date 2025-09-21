@@ -212,10 +212,12 @@ You can connect to the PostgreSQL database using any PostgreSQL client for debug
 
 #### **Connection Settings**
 - **Host**: `localhost`
-- **Port**: `5432`
+- **Port**: `5433` *(Docker PostgreSQL - avoids conflicts with local PostgreSQL)*
 - **Database**: `yoo_development` (or `yoo_test` for test database)
 - **Username**: `yoo`
 - **Password**: `password`
+
+> **💡 Port Configuration**: This project uses port `5433` to avoid conflicts with local PostgreSQL installations that typically run on port `5432`. This allows you to run both your local PostgreSQL and Docker PostgreSQL simultaneously.
 
 #### **Popular Database Clients**
 
@@ -237,10 +239,10 @@ You can connect to the PostgreSQL database using any PostgreSQL client for debug
 **psql** (Command line - requires local PostgreSQL client)
 ```bash
 # Only works if you have PostgreSQL client installed locally:
-psql -h localhost -p 5432 -U yoo -d yoo_development
+psql -h localhost -p 5433 -U yoo -d yoo_development
 
 # Or using connection URL
-psql postgresql://yoo:password@localhost:5432/yoo_development
+psql postgresql://yoo:password@localhost:5433/yoo_development
 
 # If you don't have psql installed locally, use this instead:
 ./dx/exec psql -h db -U yoo -d yoo_development
@@ -252,7 +254,7 @@ psql postgresql://yoo:password@localhost:5432/yoo_development
 
 Connection URL format:
 ```
-postgresql://yoo:password@localhost:5432/yoo_development
+postgresql://yoo:password@localhost:5433/yoo_development
 ```
 
 #### **Quick Database Commands**
@@ -278,6 +280,40 @@ psql -h localhost -p 5432 -U yoo -d yoo_development
 ```
 
 **Note**: The database is only accessible when containers are running (`./dx/start`).
+
+#### **Coexisting with Local PostgreSQL**
+
+This project is configured to work alongside your existing local PostgreSQL installation:
+
+**Port Separation:**
+- **Local PostgreSQL**: Port `5432` (your existing databases)
+- **Docker PostgreSQL**: Port `5433` (this project's databases)
+
+**Managing Both Services:**
+```bash
+# Your local PostgreSQL (if using Homebrew)
+brew services start postgresql    # Runs on port 5432
+brew services stop postgresql
+
+# Docker PostgreSQL (this project)
+./dx/start                       # Runs on port 5433
+./dx/stop
+```
+
+**TablePlus Connection Examples:**
+```bash
+# For this project (Docker)
+Host: localhost, Port: 5433, User: yoo, Password: password
+
+# For your local PostgreSQL
+Host: localhost, Port: 5432, User: your_username, Password: your_password
+```
+
+**Why This Configuration?**
+- No need to stop your local PostgreSQL
+- Both databases can run simultaneously
+- Easier debugging and development workflow
+- Clear separation between project and local databases
 
 #### **Troubleshooting Database Connections**
 
