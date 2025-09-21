@@ -2,7 +2,7 @@
 # Run Rails test suite with proper test environment
 
 echo "🧪 Running Rails test suite..."
-echo "💡 Run './dx/prepare' first if this is your first test run"
+echo "💡 Run './dx/setup' first if this is your first test run"
 echo ""
 
 # Run tests with test environment

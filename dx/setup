@@ -1,11 +1,11 @@
 #!/bin/bash
-# Prepare databases for development and testing
+# Setup databases for development and testing
 
 # Source common functions
 source "$(dirname "$0")/_common"
 check_docker
 
-echo "🗄️  Preparing databases..."
+echo "🗄️  Setting up databases..."
 echo "🔄 This may take a moment on first run..."
 echo ""
 

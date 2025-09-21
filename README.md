@@ -39,12 +39,13 @@ All development commands are located in the `dx/` directory for easy access. Run
 | `./dx/dev` | Start Rails server | Access at http://localhost:3000 |
 | `./dx/console` | Start Rails console | Interactive Ruby/Rails console |
 
-### Testing
+### Testing & Quality
 
 | Command | Description | Usage |
 |---------|-------------|-------|
-| `./dx/prepare` | Prepare dev & test databases | Sets up both environments |
+| `./dx/setup` | Setup dev & test databases | Sets up both environments |
 | `./dx/test` | Run test suite | `./dx/test` or `./dx/test <specific_test>` |
+| `./dx/lint` | Run RuboCop linter | Check code style and quality |
 
 ### Utilities
 
@@ -59,11 +60,11 @@ All development commands are located in the `dx/` directory for easy access. Run
 ```bash
 ./dx/build     # Build Docker images
 ./dx/start     # Start container
-./dx/prepare   # Setup development & test databases
+./dx/setup     # Setup development & test databases
 
 # Or use the one-command approach
 ./dx/reset     # Stop, build, and start fresh
-./dx/prepare   # Setup databases
+./dx/setup     # Setup databases
 ```
 
 ### Daily Development
@@ -79,9 +80,10 @@ All development commands are located in the `dx/` directory for easy access. Run
 ./dx/exec rails generate model User
 ./dx/exec rails db:migrate
 
-# Terminal 3 - Testing
+# Terminal 3 - Testing & Quality
 ./dx/test
 ./dx/test test/models/user_test.rb
+./dx/lint
 
 # View logs when debugging
 ./dx/logs -f    # Follow logs in real-time
@@ -113,8 +115,9 @@ All development commands are located in the `dx/` directory for easy access. Run
 │   ├── logs           # View container logs
 │   ├── dev            # Start Rails server
 │   ├── console        # Rails console
-│   ├── prepare        # Setup databases (dev & test)
+│   ├── setup          # Setup databases (dev & test)
 │   ├── test           # Run test suite
+│   ├── lint           # Run RuboCop linter
 │   ├── exec           # Execute container commands
 │   ├── help           # Show all commands
 │   └── _common        # Shared functions & error handling
@@ -136,7 +139,7 @@ The development environment uses:
 
 ```bash
 # Setup databases (first time only)
-./dx/prepare    # Sets up both development and test databases
+./dx/setup      # Sets up both development and test databases
 
 # Run all tests
 ./dx/test
@@ -154,7 +157,7 @@ The development environment uses:
 2. Clone the repository
 3. Follow the Quick Start guide above
 4. Make your changes with live reload
-5. Run tests before committing: `./dx/test`
+5. Run tests and linting before committing: `./dx/test && ./dx/lint`
 
 ## 💡 Tips
 

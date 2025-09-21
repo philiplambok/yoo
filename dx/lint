@@ -1,0 +1,16 @@
+#!/bin/bash
+# Run RuboCop linter for code quality checks
+
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
+echo "🔍 Running RuboCop linter..."
+echo "💡 This will check code style and quality"
+echo ""
+
+# Run RuboCop with container
+docker-compose -f docker-compose.dev.yml exec app bundle exec rubocop "$@"
+
+echo ""
+echo "✅ Linting complete!"
