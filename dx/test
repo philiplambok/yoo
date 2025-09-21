@@ -1,0 +1,9 @@
+#!/bin/bash
+# Run Rails test suite with proper test environment
+
+echo "🧪 Running Rails test suite..."
+echo "💡 Run './dx/prepare' first if this is your first test run"
+echo ""
+
+# Run tests with test environment
+docker-compose -f docker-compose.dev.yml exec -e RAILS_ENV=test app bundle exec rails test "$@"

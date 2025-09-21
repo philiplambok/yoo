@@ -1,0 +1,10 @@
+#!/bin/bash
+# Prepare test database for Rails testing
+
+echo "🗄️  Preparing test database..."
+echo "🔄 This may take a moment on first run..."
+echo ""
+
+docker-compose -f docker-compose.dev.yml exec -e RAILS_ENV=test app bundle exec rails db:test:prepare
+
+echo "✅ Test database ready!"
