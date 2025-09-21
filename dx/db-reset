@@ -1,0 +1,5 @@
+#!/bin/bash
+# Alias for reset-db command (Rails db:reset equivalent)
+
+# Just call the main reset-db command
+exec "$(dirname "$0")/reset-db" "$@"

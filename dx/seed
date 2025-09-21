@@ -1,0 +1,16 @@
+#!/bin/bash
+# Seed the database with sample data
+
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
+echo "🌱 Seeding database with sample data..."
+echo "💡 This will add sample users, posts, messages, and scaffolds"
+echo ""
+
+# Run the Rails seed command
+docker-compose -f docker-compose.dev.yml exec app bundle exec rails db:seed
+
+echo ""
+echo "✅ Database seeding complete!"

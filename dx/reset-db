@@ -1,0 +1,37 @@
+#!/bin/bash
+# Reset database: drop, create, migrate, and seed
+
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
+echo "🗑️  Resetting database..."
+echo "⚠️  This will delete ALL existing data!"
+echo "🔄 Process: Drop → Create → Migrate → Seed"
+echo ""
+
+# Ask for confirmation
+read -p "Are you sure you want to reset the database? (y/N): " confirm
+if [[ $confirm != [yY] && $confirm != [yY][eE][sS] ]]; then
+    echo "❌ Database reset cancelled."
+    exit 0
+fi
+
+echo ""
+echo "🗑️  Dropping existing database..."
+docker-compose -f docker-compose.dev.yml exec app bundle exec rails db:drop
+
+echo ""
+echo "🆕 Creating new database..."
+docker-compose -f docker-compose.dev.yml exec app bundle exec rails db:create
+
+echo ""
+echo "🔄 Running migrations..."
+docker-compose -f docker-compose.dev.yml exec app bundle exec rails db:migrate
+
+echo ""
+echo "🌱 Seeding database..."
+docker-compose -f docker-compose.dev.yml exec app bundle exec rails db:seed
+
+echo ""
+echo "✅ Database reset complete! Fresh database with sample data ready."
