@@ -175,6 +175,31 @@ The development environment uses:
 ./dx/test test/models/user_test.rb -n test_should_be_valid
 ```
 
+## 🌐 Testable URLs
+
+After running `./dx/seed`, you can test these URLs to see the sample data in action:
+
+### Main Resources
+- **📄 Root Page**: [http://localhost:3000](http://localhost:3000) - Messages index (homepage)
+- **👥 Users**: [http://localhost:3000/users](http://localhost:3000/users) - List all sample users
+- **📝 Posts**: [http://localhost:3000/posts](http://localhost:3000/posts) - Development-focused blog posts
+- **💬 Messages**: [http://localhost:3000/messages](http://localhost:3000/messages) - Welcome messages and community guidelines
+
+### Individual Records (Examples)
+- **📄 First Post**: [http://localhost:3000/posts/1](http://localhost:3000/posts/1) - "Welcome to our Rails Application"
+- **👤 Admin User**: [http://localhost:3000/users/1](http://localhost:3000/users/1) - admin@example.com
+- **💬 Welcome Message**: [http://localhost:3000/messages/1](http://localhost:3000/messages/1) - Platform welcome message
+
+### System Health
+- **🏥 Health Check**: [http://localhost:3000/up](http://localhost:3000/up) - Rails application health status
+
+### Quick Demo Flow:
+```bash
+./dx/seed          # Populate with sample data
+./dx/dev           # Start Rails server
+# Visit http://localhost:3000 to explore!
+```
+
 ## 🤝 Contributing
 
 This project serves as a reference implementation for DX commands. Contributions are welcome for:
