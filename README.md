@@ -1,6 +1,24 @@
-# Yoo - Rails Development Environment
+# Yoo - Developer Experience (DX) Command Prototyping
 
-A Rails 8.0.2.1 application with Docker-based development environment for easy setup and consistent development experience.
+A sample Rails 8.0.2.1 application designed for prototyping and demonstrating **Developer Experience (DX)** commands. This project showcases a comprehensive set of `dx/` commands that streamline Rails development workflows with Docker.
+
+## 🎯 About DX Commands
+
+The `dx/` directory contains a collection of developer experience commands that simplify common development tasks:
+- **Container Management** - Build, start, stop, and rebuild environments
+- **Database Operations** - Setup, seeding, and complete database resets  
+- **Development Tools** - Rails server, console, testing, and linting
+- **Utilities** - Logging, status checking, and command execution
+
+These commands demonstrate best practices for creating intuitive, consistent developer workflows that reduce cognitive load and improve productivity.
+
+### DX Command Design Principles:
+- **🎯 Single Purpose** - Each command does one thing well
+- **📝 Clear Naming** - Intuitive, verb-based command names
+- **🔄 Consistent Interface** - Standardized output, error handling, and help
+- **⚡ Developer Friendly** - Helpful messages, progress indicators, and confirmations
+- **🛡️ Safe by Default** - Confirmation prompts for destructive operations
+- **🔍 Discoverable** - Comprehensive help and documentation
 
 ## 🚀 Quick Start
 
@@ -159,6 +177,14 @@ The development environment uses:
 
 ## 🤝 Contributing
 
+This project serves as a reference implementation for DX commands. Contributions are welcome for:
+
+1. **New DX commands** - Add useful developer workflow automation
+2. **Command improvements** - Better error handling, messaging, or functionality  
+3. **Documentation** - Clear examples and best practices
+4. **Rails app features** - Sample functionality to demonstrate DX commands
+
+### Getting Started:
 1. Ensure Docker is installed on your system
 2. Clone the repository
 3. Follow the Quick Start guide above
