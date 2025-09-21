@@ -22,3 +22,13 @@ Things you may want to cover:
 * Deployment instructions
 
 * ...
+
+## Note
+
+Start the container:
+
+  docker-compose -f docker-compose.dev.yml up --build -d
+
+Run the Rails server:
+
+  docker-compose -f docker-compose.dev.yml exec app bin/dev -b 0.0.0.0

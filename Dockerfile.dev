@@ -63,5 +63,5 @@ RUN mise trust
 # Expose Rails development server port
 EXPOSE 3000
 
-# Setup shell to use mise environment and start rails server
-CMD ["bash", "-c", "source ~/.bashrc && bundle exec rails server -b 0.0.0.0"]
+# Keep container running for development
+CMD ["sleep", "infinity"]
