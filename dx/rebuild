@@ -12,8 +12,14 @@ echo "🛑 Stopping containers..."
 docker-compose -f docker-compose.dev.yml down
 
 echo ""
-echo "🔨 Building fresh images..."
-docker-compose -f docker-compose.dev.yml build
+echo "🔨 Building images (with cache)..."
+echo "💡 Use './dx/rebuild --no-cache' for fresh build without cache"
+if [ "$1" = "--no-cache" ]; then
+    echo "🧹 Building without cache..."
+    docker-compose -f docker-compose.dev.yml build --no-cache
+else
+    docker-compose -f docker-compose.dev.yml build
+fi
 
 echo ""
 echo "🚀 Starting containers..."
