@@ -34,13 +34,7 @@ RUN mise trust && \
     mise reshim && \
     mise settings add idiomatic_version_file_enable_tools ruby
 
-# Install Node.js 22.x (for Rails asset pipeline and JavaScript dependencies)
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o node_setup.sh && \
-    bash node_setup.sh && \
-    apt-get install -y nodejs && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install yarn (alternative to npm for Rails projects)
+# Install yarn (alternative to npm for Rails projects) - Node.js installed via mise
 RUN npm install -g yarn
 
 # Install bundler for Ruby gem management
