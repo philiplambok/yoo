@@ -1,0 +1,17 @@
+#!/bin/bash
+# View container logs
+
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
+if [ "$1" = "-f" ] || [ "$1" = "--follow" ]; then
+    echo "📜 Following container logs (Ctrl+C to stop)..."
+    echo ""
+    docker-compose -f docker-compose.dev.yml logs -f
+else
+    echo "📜 Showing recent container logs..."
+    echo "💡 Use './dx/logs -f' to follow logs in real-time"
+    echo ""
+    docker-compose -f docker-compose.dev.yml logs --tail=50
+fi

@@ -6,3 +6,5 @@ echo "💡 Type 'exit' to return to terminal"
 echo ""
 
 docker-compose -f docker-compose.dev.yml exec app bundle exec rails console
+
+echo "✅ Console session ended!"

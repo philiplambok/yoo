@@ -7,3 +7,6 @@ echo ""
 
 # Run tests with test environment
 docker-compose -f docker-compose.dev.yml exec -e RAILS_ENV=test app bundle exec rails test "$@"
+
+echo ""
+echo "✅ Test run complete!"

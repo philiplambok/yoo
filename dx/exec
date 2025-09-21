@@ -4,7 +4,9 @@
 if [ $# -eq 0 ]; then
     echo "🐚 Opening interactive bash shell in container..."
     docker-compose -f docker-compose.dev.yml exec app bash
+    echo "✅ Shell session ended!"
 else
     echo "⚡ Executing: $@"
     docker-compose -f docker-compose.dev.yml exec app "$@"
+    echo "✅ Command execution complete!"
 fi

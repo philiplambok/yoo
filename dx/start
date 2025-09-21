@@ -1,6 +1,10 @@
 #!/bin/bash
 # Start Docker development container in detached mode
 
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
 echo "🚀 Starting development container in background..."
 docker-compose -f docker-compose.dev.yml up -d
 

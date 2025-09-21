@@ -1,0 +1,26 @@
+#!/bin/bash
+# Show current container status
+
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
+echo "📊 Development Environment Status"
+echo "================================="
+echo ""
+
+# Check if containers are running
+if docker-compose -f docker-compose.dev.yml ps | grep -q "Up"; then
+    echo "🟢 Containers are running:"
+    docker-compose -f docker-compose.dev.yml ps
+    echo ""
+    echo "🌐 Rails server should be accessible at: http://localhost:3000"
+else
+    echo "🔴 No containers are currently running"
+    echo "💡 Run './dx/start' to start the development environment"
+fi
+
+echo ""
+echo "📈 Docker system info:"
+echo "  Images: $(docker images --format "table {{.Repository}}" | grep -c yoo || echo "0") local"
+echo "  Containers: $(docker ps -a --format "table {{.Names}}" | grep -c yoo || echo "0") total"

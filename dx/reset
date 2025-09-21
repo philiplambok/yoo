@@ -1,0 +1,23 @@
+#!/bin/bash
+# Full environment reset: stop, build, start
+
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
+echo "🔄 Performing full environment reset..."
+echo ""
+
+echo "🛑 Stopping containers..."
+docker-compose -f docker-compose.dev.yml down
+
+echo ""
+echo "🔨 Building fresh images..."
+docker-compose -f docker-compose.dev.yml build
+
+echo ""
+echo "🚀 Starting containers..."
+docker-compose -f docker-compose.dev.yml up -d
+
+echo ""
+echo "✅ Environment reset complete! Run './dx/dev' to start Rails server."

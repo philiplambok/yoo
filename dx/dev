@@ -1,6 +1,10 @@
 #!/bin/bash
 # Start Rails development server with proper binding
 
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
 echo "🚂 Starting Rails development server..."
 echo "📡 Server will be accessible at http://localhost:3000"
 echo "🔄 Press Ctrl+C to stop"

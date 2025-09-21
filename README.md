@@ -12,34 +12,46 @@ A Rails 8.0.2.1 application with Docker-based development environment for easy s
 # Start Rails server (in a new terminal)
 ./dx/dev
 # Visit http://localhost:3000
+
+# Or use the reset command for a fresh start
+./dx/reset
 ```
 
 ## 📋 Available Commands
 
-All development commands are located in the `dx/` directory for easy access:
+All development commands are located in the `dx/` directory for easy access. Run `./dx/help` for a complete overview.
 
-### Core Commands
+### Container Management
 
 | Command | Description | Usage |
 |---------|-------------|-------|
 | `./dx/build` | Build Docker development images | Run after Dockerfile changes |
 | `./dx/start` | Start container in detached mode | Start development environment |
 | `./dx/stop` | Stop and remove containers | Clean shutdown |
+| `./dx/reset` | Full environment reset | Stop → Build → Start in one command |
+| `./dx/status` | Show container status | Check if containers are running |
+| `./dx/logs` | View container logs | Use `-f` flag to follow logs |
 
-### Development Commands
+### Rails Development
 
 | Command | Description | Usage |
 |---------|-------------|-------|
 | `./dx/dev` | Start Rails server | Access at http://localhost:3000 |
 | `./dx/console` | Start Rails console | Interactive Ruby/Rails console |
-| `./dx/exec` | Execute commands in container | `./dx/exec bash` or `./dx/exec <command>` |
 
-### Testing Commands
+### Testing
 
 | Command | Description | Usage |
 |---------|-------------|-------|
-| `./dx/prepare` | Prepare test database | Run before first test or after schema changes |
+| `./dx/prepare` | Prepare dev & test databases | Sets up both environments |
 | `./dx/test` | Run test suite | `./dx/test` or `./dx/test <specific_test>` |
+
+### Utilities
+
+| Command | Description | Usage |
+|---------|-------------|-------|
+| `./dx/exec` | Execute commands in container | `./dx/exec bash` or `./dx/exec <command>` |
+| `./dx/help` | Show all available commands | Complete command reference |
 
 ## 🛠️ Development Workflow
 
@@ -47,11 +59,18 @@ All development commands are located in the `dx/` directory for easy access:
 ```bash
 ./dx/build     # Build Docker images
 ./dx/start     # Start container
-./dx/prepare   # Setup test database
+./dx/prepare   # Setup development & test databases
+
+# Or use the one-command approach
+./dx/reset     # Stop, build, and start fresh
+./dx/prepare   # Setup databases
 ```
 
 ### Daily Development
 ```bash
+# Check environment status
+./dx/status
+
 # Terminal 1 - Rails server
 ./dx/dev
 
@@ -63,6 +82,9 @@ All development commands are located in the `dx/` directory for easy access:
 # Terminal 3 - Testing
 ./dx/test
 ./dx/test test/models/user_test.rb
+
+# View logs when debugging
+./dx/logs -f    # Follow logs in real-time
 ```
 
 ### Shutdown
@@ -85,12 +107,17 @@ All development commands are located in the `dx/` directory for easy access:
 ├── dx/                 # Development scripts
 │   ├── build          # Build Docker images
 │   ├── start          # Start containers
+│   ├── stop           # Stop containers
+│   ├── reset          # Full environment reset
+│   ├── status         # Show container status
+│   ├── logs           # View container logs
 │   ├── dev            # Start Rails server
 │   ├── console        # Rails console
-│   ├── prepare        # Setup test database
+│   ├── prepare        # Setup databases (dev & test)
 │   ├── test           # Run test suite
 │   ├── exec           # Execute container commands
-│   └── stop           # Stop containers
+│   ├── help           # Show all commands
+│   └── _common        # Shared functions & error handling
 ├── Dockerfile.dev     # Development container definition
 ├── docker-compose.dev.yml # Development services
 └── mise.toml          # Ruby version specification
@@ -108,8 +135,8 @@ The development environment uses:
 ## 🧪 Testing
 
 ```bash
-# Setup test database (first time only)
-./dx/prepare
+# Setup databases (first time only)
+./dx/prepare    # Sets up both development and test databases
 
 # Run all tests
 ./dx/test
@@ -131,7 +158,28 @@ The development environment uses:
 
 ## 💡 Tips
 
-- All `dx/` scripts include helpful output and instructions
-- Use `./dx/exec` for any Rails commands not covered by specific scripts
-- The container stays running with `sleep infinity` for maximum flexibility
-- Database files are automatically persisted between container restarts
+- **Get help anytime**: Run `./dx/help` for a complete command overview
+- **Check status**: Use `./dx/status` to see if containers are running
+- **Debug issues**: Use `./dx/logs` or `./dx/logs -f` to view container output
+- **Fresh start**: Run `./dx/reset` for a complete environment reset
+- **Error handling**: All commands check for Docker availability automatically
+- **Database persistence**: Database files are automatically persisted between restarts
+- **Flexibility**: Use `./dx/exec` for any Rails commands not covered by specific scripts
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+```bash
+# Container not responding?
+./dx/reset
+
+# Want to see what's happening?
+./dx/logs -f
+
+# Check if everything is running
+./dx/status
+
+# Docker issues?
+# All commands will check Docker availability and provide helpful error messages
+```

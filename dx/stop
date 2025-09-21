@@ -1,6 +1,10 @@
 #!/bin/bash
 # Stop and remove Docker development containers
 
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
 echo "🛑 Stopping development containers..."
 docker-compose -f docker-compose.dev.yml down
 

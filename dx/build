@@ -1,6 +1,10 @@
 #!/bin/bash
 # Build Docker development images
 
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
 echo "🔨 Building Docker development images..."
 docker-compose -f docker-compose.dev.yml build
 
