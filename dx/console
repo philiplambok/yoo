@@ -1,0 +1,8 @@
+#!/bin/bash
+# Start Rails console in the development container
+
+echo "🎮 Starting Rails console..."
+echo "💡 Type 'exit' to return to terminal"
+echo ""
+
+docker-compose -f docker-compose.dev.yml exec app bundle exec rails console

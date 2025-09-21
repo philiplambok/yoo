@@ -1,0 +1,7 @@
+#!/bin/bash
+# Stop and remove Docker development containers
+
+echo "🛑 Stopping development containers..."
+docker-compose -f docker-compose.dev.yml down
+
+echo "✅ Containers stopped and removed!"

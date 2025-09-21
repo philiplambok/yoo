@@ -1,0 +1,10 @@
+#!/bin/bash
+# Execute commands inside the development container
+
+if [ $# -eq 0 ]; then
+    echo "🐚 Opening interactive bash shell in container..."
+    docker-compose -f docker-compose.dev.yml exec app bash
+else
+    echo "⚡ Executing: $@"
+    docker-compose -f docker-compose.dev.yml exec app "$@"
+fi
