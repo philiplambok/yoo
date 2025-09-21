@@ -1,6 +1,10 @@
 #!/bin/bash
 # Start Rails console in the development container
 
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
 echo "🎮 Starting Rails console..."
 echo "💡 Type 'exit' to return to terminal"
 echo ""

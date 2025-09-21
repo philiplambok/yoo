@@ -1,6 +1,10 @@
 #!/bin/bash
 # Run Rails test suite with proper test environment
 
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
 echo "🧪 Running Rails test suite..."
 echo "💡 Run './dx/setup' first if this is your first test run"
 echo ""

@@ -31,7 +31,8 @@ ENV PATH="/root/.local/bin:/root/.local/share/mise/shims:$PATH"
 COPY mise.toml ./
 RUN mise trust && \
     mise install && \
-    mise reshim
+    mise reshim && \
+    mise settings add idiomatic_version_file_enable_tools ruby
 
 # Install Node.js 22.x (for Rails asset pipeline and JavaScript dependencies)
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o node_setup.sh && \
