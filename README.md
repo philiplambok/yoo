@@ -216,6 +216,55 @@ This project serves as a reference implementation for DX commands. Contributions
 4. Make your changes with live reload
 5. Run tests and linting before committing: `./dx/test && ./dx/lint`
 
+### Adding New DX Commands
+
+When creating new dx commands, follow these patterns:
+
+#### **1. Command Structure Template**
+```bash
+#!/bin/bash
+# Brief description of what this command does
+
+# Source common functions
+source "$(dirname "$0")/_common"
+check_docker
+
+echo "🎯 Starting [operation]..."
+echo "💡 Helpful tip or context"
+echo ""
+
+# Main command execution
+docker-compose -f docker-compose.dev.yml exec app [your-command]
+
+echo ""
+echo "✅ [Operation] complete!"
+```
+
+#### **2. Naming Conventions**
+- **Single words** when possible (`build`, `test`, `lint`)
+- **Hyphenated for compound actions** (`reset-db`, `db-reset`)
+- **Verb-based** for actions (`start`, `stop`, `rebuild`)
+- **Noun-based** for information (`status`, `logs`, `help`)
+
+#### **3. Required Elements**
+- **Executable permissions**: `chmod +x dx/your-command`
+- **Common functions**: Always source and call `check_docker`
+- **Helpful output**: Use emojis and clear messaging
+- **Error handling**: Provide actionable error messages
+- **Documentation**: Update `dx/help` and README.md
+
+#### **4. Testing New Commands**
+```bash
+# Test your command
+./dx/your-command
+
+# Verify help integration
+./dx/help
+
+# Test error handling
+# (stop containers and test error messages)
+```
+
 ## 💡 Tips
 
 - **Get help anytime**: Run `./dx/help` for a complete command overview
@@ -226,6 +275,106 @@ This project serves as a reference implementation for DX commands. Contributions
 - **Error handling**: All commands check for Docker availability automatically
 - **Database persistence**: Database files are automatically persisted between restarts
 - **Flexibility**: Use `./dx/exec` for any Rails commands not covered by specific scripts
+
+## 🏗️ How DX Commands Work
+
+### Architecture Overview
+
+The `dx/` commands provide a unified interface for Docker-based Rails development. Here's how they work behind the scenes:
+
+#### 🔧 **Core Components**
+
+**1. Shared Infrastructure (`dx/_common`)**
+```bash
+# Common functions used by all commands
+check_docker()  # Validates Docker installation and daemon
+```
+
+**2. Docker Compose Integration**
+- All commands use `docker-compose.dev.yml` for consistency
+- Commands execute inside the `app` service container
+- Volume mounting enables live code editing
+
+**3. Command Categories**
+```bash
+# Container Lifecycle
+./dx/build → docker-compose build
+./dx/start → docker-compose up -d  
+./dx/stop → docker-compose down
+
+# Rails Operations  
+./dx/dev → docker-compose exec app bundle exec rails server
+./dx/console → docker-compose exec app bundle exec rails console
+```
+
+#### ⚡ **Command Execution Flow**
+
+1. **Validation** - Check Docker availability (`check_docker()`)
+2. **Environment** - Source shared functions from `_common`
+3. **Execution** - Run Docker commands with consistent parameters
+4. **Feedback** - Provide helpful output and error messages
+
+#### 🐳 **Container Architecture**
+
+**Base Setup (Dockerfile.dev):**
+```dockerfile
+FROM debian:12                    # Stable base OS
+RUN install mise, Ruby, Node.js   # Development tools
+RUN mise settings configure       # Fix tool warnings at build time
+WORKDIR /root/yoo                 # Consistent working directory
+CMD ["sleep", "infinity"]         # Keep container alive for development
+```
+
+**Development Workflow:**
+- Container runs continuously with `sleep infinity`
+- Commands execute via `docker-compose exec app <command>`
+- Volume mounts sync local code changes instantly
+- SQLite database persists in `storage/` directory
+
+#### 🎯 **Design Principles**
+
+**1. Consistency**
+- All commands follow same structure and error handling
+- Standardized output format with emojis and clear messaging
+- Common Docker Compose configuration across all operations
+
+**2. Safety**
+- Docker availability checks prevent cryptic errors
+- Confirmation prompts for destructive operations (`reset-db`)
+- Graceful error handling with helpful suggestions
+
+**3. Developer Experience**
+- Single-word commands (`build`, `start`, `test`)
+- Helpful output showing progress and next steps
+- Comprehensive help system (`./dx/help`)
+
+**4. Maintainability**
+- Shared functions in `_common` reduce duplication
+- Clear separation between container and Rails operations
+- Self-documenting command names and structure
+
+### 🔧 Technical Implementation
+
+#### **Error Handling Pattern**
+```bash
+# Every command follows this pattern:
+source "$(dirname "$0")/_common"  # Load shared functions
+check_docker                      # Validate environment
+echo "🎯 Starting operation..."   # User feedback
+docker-compose exec app <cmd>     # Execute in container
+echo "✅ Operation complete!"     # Success confirmation
+```
+
+#### **Docker Integration**
+- **Compose File**: `docker-compose.dev.yml` defines the development environment
+- **Volume Mounting**: Live code editing without rebuilds
+- **Port Mapping**: Rails server accessible at `localhost:3000`
+- **Environment Variables**: Consistent Rails and database configuration
+
+#### **Rails Integration**
+- **Bundle Exec**: All Rails commands use `bundle exec` for consistency
+- **Environment Separation**: Test commands use `RAILS_ENV=test`
+- **Database Management**: Separate commands for setup, seeding, and reset operations
 
 ## 🔍 Troubleshooting
 
