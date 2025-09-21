@@ -1,0 +1,67 @@
+# Dockerfile.dev for Rails development environment
+
+FROM debian:12
+
+# Set environment variables for development
+ENV RAILS_ENV=development
+ENV BUNDLE_PATH=/usr/local/bundle
+ENV PATH=$BUNDLE_PATH/bin:$PATH
+
+# Update package lists and install system dependencies
+RUN apt-get update --quiet --yes && \
+    apt-get install --quiet --yes \
+    curl \
+    build-essential \
+    git \
+    sqlite3 \
+    libsqlite3-dev \
+    libyaml-dev \
+    libreadline-dev \
+    libssl-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install mise and Ruby
+RUN curl https://mise.run | sh && \
+    echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
+
+ENV PATH="/root/.local/bin:/root/.local/share/mise/shims:$PATH"
+
+# Copy mise.toml to install Ruby version specified in the file
+COPY mise.toml ./
+RUN mise trust && \
+    mise install && \
+    mise reshim
+
+# Install Node.js 22.x (for Rails asset pipeline and JavaScript dependencies)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o node_setup.sh && \
+    bash node_setup.sh && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install yarn (alternative to npm for Rails projects)
+RUN npm install -g yarn
+
+# Install bundler for Ruby gem management
+RUN gem install bundler -v 2.7.2
+
+# Set working directory
+WORKDIR /root/yoo
+
+# Copy Gemfile and Gemfile.lock first (for better Docker layer caching)
+COPY Gemfile Gemfile.lock ./
+
+# Install Ruby gems
+RUN bundle install
+
+# Copy the rest of the application code
+COPY . .
+
+# Trust mise configuration in working directory
+RUN mise trust
+
+# Expose Rails development server port
+EXPOSE 3000
+
+# Setup shell to use mise environment and start rails server
+CMD ["bash", "-c", "source ~/.bashrc && bundle exec rails server -b 0.0.0.0"]
