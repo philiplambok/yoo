@@ -121,12 +121,13 @@ All development commands are located in the `dx/` directory for easy access. Run
 
 ## 🔧 Technical Details
 
-* **Ruby Version**: 3.2.9 (managed via [mise](https://mise.jdx.dev/))
+* **Ruby Version**: 3.2.x (managed via [mise](https://mise.jdx.dev/))
 * **Rails Version**: 8.0.2.1
 * **Database**: PostgreSQL 16 (development & test)
-* **Node.js**: 22.x (for asset pipeline)
-* **Package Manager**: Yarn
+* **Node.js**: 22.x (managed via [mise](https://mise.jdx.dev/))
+* **Package Manager**: Yarn (installed via npm)
 * **Container OS**: Debian 12 (Bookworm)
+* **Version Management**: [mise](https://mise.jdx.dev/) handles both Ruby and Node.js versions
 
 ## 📂 Project Structure
 
@@ -151,7 +152,7 @@ All development commands are located in the `dx/` directory for easy access. Run
 │   └── _common        # Shared functions & error handling
 ├── Dockerfile.dev     # Development container definition
 ├── docker-compose.dev.yml # Development services
-└── mise.toml          # Ruby version specification
+└── mise.toml          # Ruby and Node.js version specification
 ```
 
 ## 🐳 Docker Configuration
@@ -160,7 +161,7 @@ The development environment uses:
 - **Volume mounting** for live code editing
 - **Port 3000** mapped to localhost:3000  
 - **PostgreSQL database** with persistent volume storage
-- **mise** for Ruby version management
+- **mise** for Ruby and Node.js version management
 - **Sleep infinity** container for flexibility
 
 ## 🧪 Testing
@@ -276,7 +277,7 @@ postgresql://yoo:password@localhost:5433/yoo_development
 brew install postgresql
 
 # Then connect directly
-psql -h localhost -p 5432 -U yoo -d yoo_development
+psql -h localhost -p 5433 -U yoo -d yoo_development
 ```
 
 **Note**: The database is only accessible when containers are running (`./dx/start`).
@@ -520,7 +521,7 @@ echo "✅ Operation complete!"     # Success confirmation
 - **Compose File**: `docker-compose.dev.yml` defines the development environment
 - **Multi-Service**: Separate containers for Rails app and PostgreSQL database
 - **Volume Mounting**: Live code editing without rebuilds
-- **Port Mapping**: Rails server at `localhost:3000`, PostgreSQL at `localhost:5432`
+- **Port Mapping**: Rails server at `localhost:3000`, PostgreSQL at `localhost:5433`
 - **Health Checks**: Database readiness validation before app startup
 - **Environment Variables**: Consistent Rails and database configuration
 
