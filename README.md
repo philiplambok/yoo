@@ -81,7 +81,7 @@ All development commands are located in the `dx/` directory for easy access. Run
 |---------|-------------|-------|
 | `./dx/setup` | Setup dev & test databases | Sets up both environments |
 | `./dx/test` | Run test suite | `./dx/test` or `./dx/test <specific_test>` |
-| `./dx/lint` | Run RuboCop linter | Check code style and quality |
+| `./dx/lint` | Run RuboCop linter | Check code style and quality, use `--fix` to auto-correct |
 | `./dx/seed` | Seed database with sample data | Populate with test data |
 | `./dx/reset-db` | Reset database completely | Drop → Create → Migrate → Seed |
 | `./dx/db-reset` | Alias for reset-db | Rails `db:reset` equivalent |
@@ -122,7 +122,8 @@ All development commands are located in the `dx/` directory for easy access. Run
 # Terminal 3 - Testing & Quality
 ./dx/test
 ./dx/test test/models/user_test.rb
-./dx/lint
+./dx/lint           # Check code style
+./dx/lint --fix     # Auto-fix style issues
 
 # View logs when debugging
 ./dx/logs -f    # Follow logs in real-time
@@ -368,6 +369,42 @@ The development environment uses:
 
 # Run specific test method
 ./dx/test test/models/user_test.rb -n test_should_be_valid
+```
+
+## 🎨 Code Quality & Linting
+
+The project uses **RuboCop** with Rails Omakase configuration for consistent code style.
+
+```bash
+# Check code style and quality
+./dx/lint
+
+# Automatically fix style issues
+./dx/lint --fix
+
+# Check specific files
+./dx/lint app/models/user.rb
+
+# Other RuboCop options (passed through)
+./dx/lint --display-cop-names    # Show cop names in output
+./dx/lint --only Layout          # Run only layout cops
+./dx/lint --safe                 # Run only safe cops
+```
+
+**Auto-Fix Features:**
+- ✅ **Trailing whitespace** - Removes extra spaces at line endings
+- ✅ **Missing final newlines** - Adds newlines at end of files
+- ✅ **Indentation issues** - Fixes spacing and alignment
+- ✅ **String quotes** - Standardizes quote usage
+- ✅ **Layout formatting** - Corrects spacing around operators
+- ⚠️  **Safe corrections only** - Won't change code logic
+
+**Workflow Integration:**
+```bash
+# Before committing changes
+./dx/lint --fix      # Auto-fix style issues
+./dx/test            # Run tests
+# Then commit your changes
 ```
 
 ## 🌐 Testable URLs
@@ -618,6 +655,7 @@ echo "✅ [Operation] complete!"
 - **Database reset**: Use `./dx/reset-db` to completely reset your database with fresh sample data
 - **Error handling**: All commands check for Docker availability automatically
 - **Database persistence**: PostgreSQL data is persisted via Docker volumes between restarts
+- **Auto-fix linting**: Use `./dx/lint --fix` to automatically correct code style issues
 - **Flexibility**: Use `./dx/exec` for any Rails commands not covered by specific scripts
 
 ## 🏗️ How DX Commands Work
