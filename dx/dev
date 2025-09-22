@@ -1,14 +1,15 @@
 #!/bin/bash
-# Start Rails development server with proper binding
+# Start Rails development server and Sidekiq worker using Foreman
 
 # Source common functions
 source "$(dirname "$0")/_common"
 check_docker
 
-echo "🚂 Starting Rails development server..."
+echo "🚂 Starting Rails development server and Sidekiq worker with Foreman..."
 echo "📡 Server will be accessible at http://localhost:3000"
-echo "🔄 Press Ctrl+C to stop"
+echo "💼 Sidekiq web UI at http://localhost:3000/sidekiq"
+echo "🔄 Press Ctrl+C to stop all processes"
 echo ""
 
-# Start the Rails server bound to all interfaces
-docker-compose -f docker-compose.dev.yml exec app bundle exec rails server -b 0.0.0.0
+# Start both processes using foreman
+docker-compose -f docker-compose.dev.yml exec app bundle exec foreman start
