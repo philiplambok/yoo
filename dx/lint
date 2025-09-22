@@ -5,25 +5,37 @@
 source "$(dirname "$0")/_common"
 check_docker
 
-# Check if --fix flag is present
+# Check if --fix flag is present and convert to proper RuboCop flag
 if [[ "$*" == *"--fix"* ]]; then
     echo "🔧 Running RuboCop with auto-fix..."
     echo "💡 This will automatically correct fixable style issues"
     echo "⚠️  Auto-fix will modify your code files"
     echo ""
+    
+    # Replace --fix with -a (safe autocorrect)
+    RUBOCOP_ARGS="${*/--fix/-a}"
+    docker-compose -f docker-compose.dev.yml exec app bundle exec rubocop $RUBOCOP_ARGS
+    
+    echo ""
+    echo "✅ Auto-fix complete! Review changes before committing."
+elif [[ "$*" == *"-a"* ]] || [[ "$*" == *"--autocorrect"* ]] || [[ "$*" == *"-A"* ]] || [[ "$*" == *"--autocorrect-all"* ]]; then
+    echo "🔧 Running RuboCop with auto-correct..."
+    echo "💡 This will automatically correct style issues"
+    echo "⚠️  Auto-correct will modify your code files"
+    echo ""
+    
+    docker-compose -f docker-compose.dev.yml exec app bundle exec rubocop "$@"
+    
+    echo ""
+    echo "✅ Auto-correct complete! Review changes before committing."
 else
     echo "🔍 Running RuboCop linter..."
     echo "💡 This will check code style and quality"
-    echo "🔧 Use './dx/lint --fix' to automatically fix issues"
+    echo "🔧 Use './dx/lint --fix' or './dx/lint -a' to automatically fix issues"
     echo ""
-fi
-
-# Run RuboCop with container
-docker-compose -f docker-compose.dev.yml exec app bundle exec rubocop "$@"
-
-echo ""
-if [[ "$*" == *"--fix"* ]]; then
-    echo "✅ Auto-fix complete! Review changes before committing."
-else
+    
+    docker-compose -f docker-compose.dev.yml exec app bundle exec rubocop "$@"
+    
+    echo ""
     echo "✅ Linting complete!"
 fi
