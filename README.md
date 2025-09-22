@@ -220,8 +220,8 @@ When you run `./dx/dev`, you'll see professional output like this:
 **Services Running:**
 - **web.1** - Rails application server (Puma)
 - **worker.1** - Sidekiq background job worker
-- **redis** - Redis server (Docker service)
-- **db** - PostgreSQL database (Docker service)
+- **redis** - Redis server (Docker service, accessible externally on port 6380)
+- **db** - PostgreSQL database (Docker service, accessible externally on port 5433)
 
 **Configuration Files:**
 - **`Procfile`** - Defines web and worker processes for Foreman
@@ -254,7 +254,7 @@ MessagesController#create → CreateRandomUsersJob.perform_later
 **Redis Connection:**
 - **Development**: `redis://redis:6379/1` (Docker service name)
 - **Container networking**: Redis accessible via `redis` hostname
-- **External access**: Redis not exposed outside Docker (secure by default)
+- **External access**: Redis exposed on `localhost:6380` (port 6380 to avoid conflicts with local Redis installations)
 
 ### 🛠️ Development Workflow
 
@@ -350,7 +350,7 @@ The development environment uses:
 - **Volume mounting** for live code editing
 - **Port 3000** mapped to localhost:3000  
 - **PostgreSQL database** with persistent volume storage (port 5433)
-- **Redis server** for background job processing
+- **Redis server** for background job processing (port 6380)
 - **Foreman** for managing multiple processes (Rails + Sidekiq)
 - **mise** for Ruby and Node.js version management
 - **Sleep infinity** container for flexibility
@@ -452,7 +452,7 @@ You can connect to the PostgreSQL database using any PostgreSQL client for debug
 - **Username**: `yoo`
 - **Password**: `password`
 
-> **💡 Port Configuration**: This project uses port `5433` to avoid conflicts with local PostgreSQL installations that typically run on port `5432`. This allows you to run both your local PostgreSQL and Docker PostgreSQL simultaneously.
+> **💡 Port Configuration**: This project uses port `5433` for PostgreSQL and port `6380` for Redis to avoid conflicts with local installations. PostgreSQL typically runs on port `5432` and Redis on port `6379`. This allows you to run both your local services and Docker services simultaneously.
 
 #### **Popular Database Clients**
 
@@ -523,15 +523,19 @@ This project is configured to work alongside your existing local PostgreSQL inst
 **Port Separation:**
 - **Local PostgreSQL**: Port `5432` (your existing databases)
 - **Docker PostgreSQL**: Port `5433` (this project's databases)
+- **Local Redis**: Port `6379` (your existing Redis)
+- **Docker Redis**: Port `6380` (this project's Redis)
 
 **Managing Both Services:**
 ```bash
-# Your local PostgreSQL (if using Homebrew)
+# Your local services (if using Homebrew)
 brew services start postgresql    # Runs on port 5432
+brew services start redis         # Runs on port 6379
 brew services stop postgresql
+brew services stop redis
 
-# Docker PostgreSQL (this project)
-./dx/start                       # Runs on port 5433
+# Docker services (this project)
+./dx/start                       # PostgreSQL on port 5433, Redis on port 6380
 ./dx/stop
 ```
 
@@ -545,10 +549,11 @@ Host: localhost, Port: 5432, User: your_username, Password: your_password
 ```
 
 **Why This Configuration?**
-- No need to stop your local PostgreSQL
-- Both databases can run simultaneously
+- No need to stop your local PostgreSQL or Redis
+- Both local and Docker services can run simultaneously
 - Easier debugging and development workflow
-- Clear separation between project and local databases
+- Clear separation between project and local services
+- Prevents port conflicts when working on multiple projects
 
 #### **Troubleshooting Database Connections**
 
@@ -570,13 +575,17 @@ Host: localhost, Port: 5432, User: your_username, Password: your_password
 - Verify database name: `yoo_development`
 
 **Port Already in Use**
-If port 5432 is already in use by a local PostgreSQL instance:
+If ports are already in use by local services:
 ```bash
-# Check what's using port 5432
+# Check what's using PostgreSQL port
 lsof -i :5432
 
-# Stop local PostgreSQL if needed (macOS with Homebrew)
+# Check what's using Redis port  
+lsof -i :6379
+
+# Stop local services if needed (macOS with Homebrew)
 brew services stop postgresql
+brew services stop redis
 ```
 
 **Database Not Found**
