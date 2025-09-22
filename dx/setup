@@ -10,11 +10,19 @@ echo "🔄 This may take a moment on first run..."
 echo ""
 
 echo "📊 Setting up development database..."
-docker-compose -f docker-compose.dev.yml exec app bundle exec rails db:setup
+docker-compose -f docker-compose.dev.yml exec app bash -c "
+  bundle exec rails db:create 2>/dev/null || echo '  📄 Database already exists'
+  bundle exec rails db:migrate
+  bundle exec rails db:seed
+"
 
 echo ""
 echo "🧪 Setting up test database..."
-docker-compose -f docker-compose.dev.yml exec -e RAILS_ENV=test app bundle exec rails db:setup
+docker-compose -f docker-compose.dev.yml exec -e RAILS_ENV=test app bash -c "
+  bundle exec rails db:create 2>/dev/null || echo '  📄 Test database already exists'
+  bundle exec rails db:environment:set RAILS_ENV=test 2>/dev/null || true
+  bundle exec rails db:schema:load 2>/dev/null || bundle exec rails db:migrate
+"
 
 echo ""
 echo "✅ All databases ready!"
