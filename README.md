@@ -379,8 +379,14 @@ The project uses **RuboCop** with Rails Omakase configuration for consistent cod
 # Check code style and quality
 ./dx/lint
 
-# Automatically fix style issues
+# Automatically fix style issues (user-friendly flag)
 ./dx/lint --fix
+
+# Use RuboCop's native autocorrect flags directly
+./dx/lint -a                     # Safe autocorrect
+./dx/lint --autocorrect          # Safe autocorrect (same as -a)
+./dx/lint -A                     # All autocorrect (safe + unsafe)
+./dx/lint --autocorrect-all      # All autocorrect (same as -A)
 
 # Check specific files
 ./dx/lint app/models/user.rb
