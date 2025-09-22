@@ -72,7 +72,7 @@ All development commands are located in the `dx/` directory for easy access. Run
 
 | Command | Description | Usage |
 |---------|-------------|-------|
-| `./dx/dev` | Start Rails server | Access at http://localhost:3000 |
+| `./dx/dev` | Start Rails server + Sidekiq worker | Access at http://localhost:3000, Sidekiq UI at /sidekiq |
 | `./dx/console` | Start Rails console | Interactive Ruby/Rails console |
 
 ### Testing & Quality
@@ -111,7 +111,7 @@ All development commands are located in the `dx/` directory for easy access. Run
 # Check environment status
 ./dx/status
 
-# Terminal 1 - Rails server
+# Terminal 1 - Rails server + Sidekiq worker
 ./dx/dev
 
 # Terminal 2 - Rails console & commands
@@ -138,10 +138,176 @@ All development commands are located in the `dx/` directory for easy access. Run
 * **Ruby Version**: 3.2.x (managed via [mise](https://mise.jdx.dev/))
 * **Rails Version**: 8.0.2.1
 * **Database**: PostgreSQL 16 (development & test)
+* **Background Jobs**: Sidekiq 7.x with Redis
+* **Process Manager**: Foreman (for running Rails + Sidekiq together)
 * **Node.js**: 22.x (managed via [mise](https://mise.jdx.dev/))
 * **Package Manager**: Yarn (installed via npm)
 * **Container OS**: Debian 12 (Bookworm)
 * **Version Management**: [mise](https://mise.jdx.dev/) handles both Ruby and Node.js versions
+
+## 🚀 Background Jobs with Sidekiq
+
+This project includes a complete **Sidekiq** setup for background job processing, managed by **Foreman** for a professional development experience.
+
+### ✨ What's Included
+
+- **Sidekiq** - Background job processing with Redis
+- **Redis** - Automatically configured in Docker Compose
+- **Foreman** - Professional process manager for running multiple services
+- **Sidekiq Web UI** - Job monitoring dashboard
+- **Sample Job** - `CreateRandomUsersJob` demonstrates background job functionality
+
+### 🎯 Key Features
+
+**Single Command Development:**
+```bash
+./dx/dev
+```
+This now starts **both** Rails server and Sidekiq worker using Foreman!
+
+**Professional Process Management:**
+- Color-coded logs with timestamps
+- Clean process shutdown with Ctrl+C
+- Industry-standard Procfile configuration
+- Proper PID management and cleanup
+
+**Ready-to-Use Background Jobs:**
+- Pre-configured Sidekiq worker
+- Redis connection automatically set up
+- Sample job that creates 5 random users
+- Job triggered automatically when creating messages
+
+### 🖥️ Accessing Services
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Rails App** | [http://localhost:3000](http://localhost:3000) | Main application |
+| **Sidekiq Web UI** | [http://localhost:3000/sidekiq](http://localhost:3000/sidekiq) | Job monitoring dashboard |
+
+### 📋 Process Output
+
+When you run `./dx/dev`, you'll see professional output like this:
+
+```bash
+🚂 Starting Rails development server and Sidekiq worker with Foreman...
+📡 Server will be accessible at http://localhost:3000
+💼 Sidekiq web UI at http://localhost:3000/sidekiq
+🔄 Press Ctrl+C to stop all processes
+
+13:32:29 web.1    | started with pid 22
+13:32:29 worker.1 | started with pid 23
+13:32:32 web.1    | * Listening on http://0.0.0.0:3000
+13:32:32 worker.1 | INFO: Sidekiq 7.3.9 connecting to Redis
+```
+
+### 🎮 Testing Background Jobs
+
+**Try the Sample Job:**
+1. Start the development server: `./dx/dev`
+2. Visit [http://localhost:3000/messages/new](http://localhost:3000/messages/new)
+3. Create a new message
+4. Check [http://localhost:3000/sidekiq](http://localhost:3000/sidekiq) to see the job processed
+5. Visit [http://localhost:3000/users](http://localhost:3000/users) to see the 5 new random users created!
+
+**Monitor Jobs:**
+- **Sidekiq Web UI**: Real-time job monitoring, retry management, and statistics
+- **Process Logs**: See job execution in the Foreman output
+- **Database**: Check the `users` table to see background job results
+
+### 🏗️ Architecture
+
+**Services Running:**
+- **web.1** - Rails application server (Puma)
+- **worker.1** - Sidekiq background job worker
+- **redis** - Redis server (Docker service)
+- **db** - PostgreSQL database (Docker service)
+
+**Configuration Files:**
+- **`Procfile`** - Defines web and worker processes for Foreman
+- **`config/initializers/sidekiq.rb`** - Sidekiq Redis connection setup
+- **`config/redis.yml`** - Redis connection configuration
+- **`app/jobs/create_random_users_job.rb`** - Sample background job
+- **`.env`** - Environment variables (PORT=3000)
+
+### 🔧 How It Works
+
+**Process Management:**
+```bash
+# Procfile defines processes
+web: bundle exec rails server -b 0.0.0.0 -p $PORT
+worker: bundle exec sidekiq
+
+# Foreman starts both processes
+./dx/dev → foreman start → web.1 + worker.1
+```
+
+**Background Job Flow:**
+```bash
+# When a message is created:
+MessagesController#create → CreateRandomUsersJob.perform_later
+                        → Sidekiq queues job in Redis
+                        → Sidekiq worker processes job
+                        → Creates 5 random users
+```
+
+**Redis Connection:**
+- **Development**: `redis://redis:6379/1` (Docker service name)
+- **Container networking**: Redis accessible via `redis` hostname
+- **External access**: Redis not exposed outside Docker (secure by default)
+
+### 🛠️ Development Workflow
+
+**Daily Development:**
+```bash
+./dx/dev              # Start Rails + Sidekiq (single command!)
+# Visit http://localhost:3000/sidekiq to monitor jobs
+# Create messages to trigger background jobs
+# Ctrl+C stops both processes cleanly
+```
+
+**Adding New Jobs:**
+```bash
+./dx/exec rails generate job MyNewJob
+# Edit app/jobs/my_new_job.rb
+# Queue jobs with: MyNewJobJob.perform_later(args)
+```
+
+**Debugging Jobs:**
+- Check Sidekiq Web UI for failed jobs and retry them
+- View worker logs in the Foreman output (worker.1)
+- Use Rails console: `./dx/console` then `Sidekiq.redis.info`
+
+### ⚙️ Advanced Configuration
+
+**Custom Queues:**
+```ruby
+# In your job class
+class MyJob < ApplicationJob
+  queue_as :critical
+end
+
+# Add to Procfile
+worker: bundle exec sidekiq -q critical,5 -q default
+```
+
+**Environment-Specific Settings:**
+- **Development**: Jobs run immediately for instant feedback
+- **Production**: Configure Redis URL via `REDIS_URL` environment variable
+- **Testing**: Jobs run synchronously in test environment
+
+### 🎯 Why This Setup?
+
+**Professional Development:**
+- **Industry Standard**: Foreman is used by Heroku and many Rails teams
+- **Clean Separation**: Background jobs don't block web requests
+- **Easy Monitoring**: Web UI shows job status, failures, and performance
+- **Production Ready**: Same tools used in production environments
+
+**Developer Experience:**
+- **Single Command**: `./dx/dev` starts everything you need
+- **Live Feedback**: See jobs processing in real-time
+- **Easy Debugging**: Clear logs and monitoring dashboard
+- **No Manual Setup**: Redis and Sidekiq configured automatically
 
 ## 📂 Project Structure
 
@@ -153,7 +319,7 @@ All development commands are located in the `dx/` directory for easy access. Run
 │   ├── rebuild        # Full environment rebuild
 │   ├── status         # Show container status
 │   ├── logs           # View container logs
-│   ├── dev            # Start Rails server
+│   ├── dev            # Start Rails server + Sidekiq worker (Foreman)
 │   ├── console        # Rails console
 │   ├── setup          # Setup databases (dev & test)
 │   ├── test           # Run test suite
@@ -164,8 +330,16 @@ All development commands are located in the `dx/` directory for easy access. Run
 │   ├── exec           # Execute container commands
 │   ├── help           # Show all commands
 │   └── _common        # Shared functions & error handling
+├── Procfile           # Foreman process definitions (web + worker)
+├── .env               # Environment variables (PORT=3000)
+├── config/
+│   ├── redis.yml      # Redis connection configuration
+│   └── initializers/
+│       └── sidekiq.rb # Sidekiq setup
+├── app/jobs/          # Background jobs directory
+│   └── create_random_users_job.rb # Sample background job
 ├── Dockerfile.dev     # Development container definition
-├── docker-compose.dev.yml # Development services
+├── docker-compose.dev.yml # Development services (app, db, redis)
 └── mise.toml          # Ruby and Node.js version specification
 ```
 
@@ -174,7 +348,9 @@ All development commands are located in the `dx/` directory for easy access. Run
 The development environment uses:
 - **Volume mounting** for live code editing
 - **Port 3000** mapped to localhost:3000  
-- **PostgreSQL database** with persistent volume storage
+- **PostgreSQL database** with persistent volume storage (port 5433)
+- **Redis server** for background job processing
+- **Foreman** for managing multiple processes (Rails + Sidekiq)
 - **mise** for Ruby and Node.js version management
 - **Sleep infinity** container for flexibility
 
@@ -211,6 +387,7 @@ After running `./dx/seed`, you can test these URLs to see the sample data in act
 
 ### System Health
 - **🏥 Health Check**: [http://localhost:3000/up](http://localhost:3000/up) - Rails application health status
+- **💼 Sidekiq Dashboard**: [http://localhost:3000/sidekiq](http://localhost:3000/sidekiq) - Background job monitoring
 
 ### Quick Demo Flow:
 ```bash
@@ -470,7 +647,7 @@ check_docker()  # Validates Docker installation and daemon
 ./dx/stop → docker-compose down
 
 # Rails Operations  
-./dx/dev → docker-compose exec app bundle exec rails server
+./dx/dev → docker-compose exec app bundle exec foreman start
 ./dx/console → docker-compose exec app bundle exec rails console
 ```
 
