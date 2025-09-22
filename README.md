@@ -19,6 +19,20 @@ These commands demonstrate best practices for creating intuitive, consistent dev
 - **⚡ Developer Friendly** - Helpful messages, progress indicators, and confirmations
 - **🛡️ Safe by Default** - Confirmation prompts for destructive operations
 - **🔍 Discoverable** - Comprehensive help and documentation
+- **🐳 Zero Setup** - Docker-only approach eliminates complex local environment setup
+
+## 📋 Prerequisites
+
+**Only Docker is required!** 🐳
+
+- **Docker Desktop** (macOS/Windows) or **Docker Engine** (Linux)
+- That's it! No need to install Ruby, Node.js, PostgreSQL, or any other dependencies locally
+
+> **💡 Why Docker Only?** This project uses a containerized development environment that includes all necessary tools (Ruby 3.2.x, Node.js 22.x, PostgreSQL 16, and system dependencies). Everything runs inside Docker containers, keeping your local machine clean and ensuring consistent development environments across all team members.
+
+**Quick Docker Installation:**
+- **macOS/Windows**: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- **Linux**: [Docker Engine](https://docs.docker.com/engine/install/)
 
 ## 🚀 Quick Start
 
@@ -361,11 +375,13 @@ This project serves as a reference implementation for DX commands. Contributions
 4. **Rails app features** - Sample functionality to demonstrate DX commands
 
 ### Getting Started:
-1. Ensure Docker is installed on your system
-2. Clone the repository
-3. Follow the Quick Start guide above
-4. Make your changes with live reload
-5. Run tests and linting before committing: `./dx/test && ./dx/lint`
+1. **Install Docker** - The only prerequisite! No Ruby, Node.js, or PostgreSQL installation needed
+2. **Clone the repository**
+3. **Follow the Quick Start guide** - Everything runs in containers
+4. **Make your changes** - Live reload works automatically via volume mounting
+5. **Run tests and linting** before committing: `./dx/test && ./dx/lint`
+
+> **🎯 DX Goal**: Demonstrate how containerized development eliminates "works on my machine" problems and complex local setups. One command gets you from zero to productive development environment.
 
 ### Adding New DX Commands
 
